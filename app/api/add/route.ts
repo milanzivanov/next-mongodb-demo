@@ -1,26 +1,30 @@
 import clientPromise from "@/lib/mongodb";
 
-export async function GET() {
-  const client = await clientPromise;
-  const db = client.db();
+export async function POST(req: Request) {
+  try {
+    const body = await req.json();
+    const title = body?.title?.trim();
 
-  const result = await db.collection("test 2").insertOne({
-    poruka: "Hello MongoDB!",
-    vreme: new Date()
-  });
+    if (!title) {
+      return Response.json(
+        { success: false, message: "Title is required" },
+        { status: 400 }
+      );
+    }
 
-  return Response.json({ success: true, id: result.insertedId });
+    const client = await clientPromise;
+    const db = client.db("sample_mflix");
+
+    const result = await db.collection("user_movies").insertOne({
+      title,
+      createdAt: new Date()
+    });
+
+    return Response.json({ success: true, id: result.insertedId });
+  } catch {
+    return Response.json(
+      { success: false, message: "Invalid request" },
+      { status: 400 }
+    );
+  }
 }
-
-// Ova funkcija POST je samo primer kako bi mogao da izgleda POST endpoint koji dodaje dokument u kolekciju "test 3 post". Trenutno je zakomentarisan, ali možeš ga otkomentarisati i prilagoditi po potrebi. Ovo moze da se testira samo u curl -X POST http://localhost:3001/api/add
-// export async function POST() {
-//   const client = await clientPromise;
-//   const db = client.db();
-
-//   const result = await db.collection("test 3 post").insertOne({
-//     poruka: "Hello MongoDB!",
-//     vreme: new Date()
-//   });
-
-//   return Response.json({ success: true, id: result.insertedId });
-// }

@@ -42,3 +42,9 @@ export type Movie = {
   };
   num_mflix_comments: number;
 };
+
+export type UserMovie = {
+  _id: string;
+  title: string;
+  createdAt: string;
+};
